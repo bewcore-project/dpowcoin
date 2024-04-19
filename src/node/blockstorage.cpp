@@ -121,9 +121,20 @@ bool BlockTreeDB::LoadBlockIndexGuts(const Consensus::Params& consensusParams, s
                 pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
 
+                /* Dual Pow Dpowcoin - we use Litcoin solution */
+                /*
+                Litecoin: Disable PoW Sanity check while loading block index from disk.
+                We use the sha256 hash for the block index for performance reasons, which is recorded for later use.
+                CheckProofOfWork() uses the scrypt hash which is discarded after a block is accepted.
+                While it is technically feasible to verify the PoW, doing so takes several minutes as it
+                requires recomputing every PoW hash during every Litecoin startup.
+                We opt instead to simply trust the data that is on your local disk.
+                */
+                /*
                 if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits, consensusParams)) {
                     return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
                 }
+                */
 
                 pcursor->Next();
             } else {
@@ -1028,9 +1039,12 @@ bool BlockManager::ReadBlockFromDisk(CBlock& block, const FlatFilePos& pos) cons
         return error("%s: Deserialize or I/O error - %s at %s", __func__, e.what(), pos.ToString());
     }
 
-    // Check the header
-    if (!CheckProofOfWork(block.GetHash(), block.nBits, GetConsensus())) {
-        return error("ReadBlockFromDisk: Errors in block header at %s", pos.ToString());
+    // Check the header for both variants of Proof of Work (dual pow logic)
+    bool powResult1 = CheckProofOfWork(block.GetYespowerPoWHash(), block.nBits, GetConsensus());
+    bool powResult2 = CheckProofOfWork(block.GetArgon2idPoWHash(), block.nBits, GetConsensus());
+
+    if (!(powResult1 && powResult2)) {
+        return error("ReadBlockFromDisk: Proof of Work is not valid for both variants for the block header at %s", pos.ToString());
     }
 
     // Signet only: check block solution

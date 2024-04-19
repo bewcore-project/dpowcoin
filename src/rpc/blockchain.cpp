@@ -506,6 +506,64 @@ static RPCHelpMan getblockhash()
     };
 }
 
+static RPCHelpMan getyespowerpowhash()
+{
+    return RPCHelpMan{"getyespowerpowhash",
+                "\nReturns hash of block in best-block-chain at height provided.\n",
+                {
+                    {"height", RPCArg::Type::NUM, RPCArg::Optional::NO, "The height index"},
+                },
+                RPCResult{
+                    RPCResult::Type::STR_HEX, "", "The block hash"},
+                RPCExamples{
+                    HelpExampleCli("getyespowerpowhash", "1000")
+            + HelpExampleRpc("getyespowerpowhash", "1000")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    ChainstateManager& chainman = EnsureAnyChainman(request.context);
+    LOCK(cs_main);
+    const CChain& active_chain = chainman.ActiveChain();
+
+    int nHeight = request.params[0].getInt<int>();
+    if (nHeight < 0 || nHeight > active_chain.Height())
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
+
+    const CBlockIndex* pblockindex = active_chain[nHeight];
+    return pblockindex->GetBlockYespowerPoWHash().GetHex();
+},
+    };
+}
+
+static RPCHelpMan getargon2idpowhash()
+{
+    return RPCHelpMan{"getargon2idpowhash",
+                "\nReturns hash of block in best-block-chain at height provided.\n",
+                {
+                    {"height", RPCArg::Type::NUM, RPCArg::Optional::NO, "The height index"},
+                },
+                RPCResult{
+                    RPCResult::Type::STR_HEX, "", "The block hash"},
+                RPCExamples{
+                    HelpExampleCli("getargon2idpowhash", "1000")
+            + HelpExampleRpc("getargon2idpowhash", "1000")
+                },
+        [&](const RPCHelpMan& self, const JSONRPCRequest& request) -> UniValue
+{
+    ChainstateManager& chainman = EnsureAnyChainman(request.context);
+    LOCK(cs_main);
+    const CChain& active_chain = chainman.ActiveChain();
+
+    int nHeight = request.params[0].getInt<int>();
+    if (nHeight < 0 || nHeight > active_chain.Height())
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Block height out of range");
+
+    const CBlockIndex* pblockindex = active_chain[nHeight];
+    return pblockindex->GetBlockArgon2idPoWHash().GetHex();
+},
+    };
+}
+
 static RPCHelpMan getblockheader()
 {
     return RPCHelpMan{"getblockheader",
@@ -2883,6 +2941,8 @@ void RegisterBlockchainRPCCommands(CRPCTable& t)
         {"blockchain", &getblock},
         {"blockchain", &getblockfrompeer},
         {"blockchain", &getblockhash},
+        {"blockchain", &getyespowerpowhash},
+        {"blockchain", &getargon2idpowhash},
         {"blockchain", &getblockheader},
         {"blockchain", &getchaintips},
         {"blockchain", &getdifficulty},
