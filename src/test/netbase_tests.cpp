@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(netbase_properties)
     BOOST_CHECK(ResolveIP("8.8.8.8").IsRoutable());
     BOOST_CHECK(ResolveIP("2001::1").IsRoutable());
     BOOST_CHECK(ResolveIP("127.0.0.1").IsValid());
-    BOOST_CHECK(CreateInternal("FD6B:88C0:8724:edb1:8e4:3588:e546:35ca").IsInternal());
+    BOOST_CHECK(CreateInternal("FDA8:FC80:449E:edb1:8e4:3588:e546:35ca").IsInternal());
     BOOST_CHECK(CreateInternal("bar.com").IsInternal());
 
 }
@@ -97,15 +97,15 @@ BOOST_AUTO_TEST_CASE(netbase_splithost)
     BOOST_CHECK(TestSplitHost("www.bitcoincore.org:80", "www.bitcoincore.org", 80));
     BOOST_CHECK(TestSplitHost("[www.bitcoincore.org]:80", "www.bitcoincore.org", 80));
     BOOST_CHECK(TestSplitHost("127.0.0.1", "127.0.0.1", 0));
-    BOOST_CHECK(TestSplitHost("127.0.0.1:8333", "127.0.0.1", 8333));
+    BOOST_CHECK(TestSplitHost("127.0.0.1:42003", "127.0.0.1", 42003));
     BOOST_CHECK(TestSplitHost("[127.0.0.1]", "127.0.0.1", 0));
-    BOOST_CHECK(TestSplitHost("[127.0.0.1]:8333", "127.0.0.1", 8333));
+    BOOST_CHECK(TestSplitHost("[127.0.0.1]:42003", "127.0.0.1", 42003));
     BOOST_CHECK(TestSplitHost("::ffff:127.0.0.1", "::ffff:127.0.0.1", 0));
-    BOOST_CHECK(TestSplitHost("[::ffff:127.0.0.1]:8333", "::ffff:127.0.0.1", 8333));
-    BOOST_CHECK(TestSplitHost("[::]:8333", "::", 8333));
-    BOOST_CHECK(TestSplitHost("::8333", "::8333", 0));
-    BOOST_CHECK(TestSplitHost(":8333", "", 8333));
-    BOOST_CHECK(TestSplitHost("[]:8333", "", 8333));
+    BOOST_CHECK(TestSplitHost("[::ffff:127.0.0.1]:42003", "::ffff:127.0.0.1", 42003));
+    BOOST_CHECK(TestSplitHost("[::]:42003", "::", 42003));
+    BOOST_CHECK(TestSplitHost("::42003", "::42003", 0));
+    BOOST_CHECK(TestSplitHost(":42003", "", 42003));
+    BOOST_CHECK(TestSplitHost("[]:42003", "", 42003));
     BOOST_CHECK(TestSplitHost("", "", 0));
     BOOST_CHECK(TestSplitHost(":65535", "", 65535));
     BOOST_CHECK(TestSplitHost(":65536", ":65536", 0, false));
@@ -135,17 +135,17 @@ bool static TestParse(std::string src, std::string canon)
 BOOST_AUTO_TEST_CASE(netbase_lookupnumeric)
 {
     BOOST_CHECK(TestParse("127.0.0.1", "127.0.0.1:65535"));
-    BOOST_CHECK(TestParse("127.0.0.1:8333", "127.0.0.1:8333"));
+    BOOST_CHECK(TestParse("127.0.0.1:42003", "127.0.0.1:42003"));
     BOOST_CHECK(TestParse("::ffff:127.0.0.1", "127.0.0.1:65535"));
     BOOST_CHECK(TestParse("::", "[::]:65535"));
-    BOOST_CHECK(TestParse("[::]:8333", "[::]:8333"));
+    BOOST_CHECK(TestParse("[::]:42003", "[::]:42003"));
     BOOST_CHECK(TestParse("[127.0.0.1]", "127.0.0.1:65535"));
     BOOST_CHECK(TestParse(":::", "[::]:0"));
 
     // verify that an internal address fails to resolve
-    BOOST_CHECK(TestParse("[fd6b:88c0:8724:1:2:3:4:5]", "[::]:0"));
+    BOOST_CHECK(TestParse("[fda8:fc80:449e:1:2:3:4:5]", "[::]:0"));
     // and that a one-off resolves correctly
-    BOOST_CHECK(TestParse("[fd6c:88c0:8724:1:2:3:4:5]", "[fd6c:88c0:8724:1:2:3:4:5]:65535"));
+    BOOST_CHECK(TestParse("[fda9:fc80:449e:1:2:3:4:5]", "[fda9:fc80:449e:1:2:3:4:5]:65535"));
 }
 
 BOOST_AUTO_TEST_CASE(embedded_test)
@@ -599,7 +599,7 @@ BOOST_AUTO_TEST_CASE(isbadport)
 
     BOOST_CHECK(!IsBadPort(80));
     BOOST_CHECK(!IsBadPort(443));
-    BOOST_CHECK(!IsBadPort(8333));
+    BOOST_CHECK(!IsBadPort(42003));
 
     // Check all ports, there must be 80 bad ports in total.
     size_t total_bad_ports{0};
