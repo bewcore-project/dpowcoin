@@ -76,7 +76,7 @@ public:
         consensus.signet_challenge.clear();
         consensus.nSubsidyHalvingInterval = 420000;
         consensus.BIP34Height = 2;
-        consensus.BIP34Hash = uint256{};
+        consensus.BIP34Hash = uint256S("0xd18a3f4ac8aab7647e2b06771cb389dba4a6ec8b107b5ea786e0e3eca0af0373");
         consensus.BIP65Height = 2;
         consensus.BIP66Height = 2;
         consensus.CSVHeight = 2;
@@ -101,8 +101,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0; // No activation delay
 
-        consensus.nMinimumChainWork = uint256S("0x00");
-        consensus.defaultAssumeValid = uint256S("0x00");
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000001800");
+        consensus.defaultAssumeValid = uint256S("0xd18a3f4ac8aab7647e2b06771cb389dba4a6ec8b107b5ea786e0e3eca0af0373");
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -154,6 +154,7 @@ public:
         checkpointData = {
             {
                 { 0, uint256S("0xd86f8a0582e779830f182befeaaabc8c73a159b6b06530910758daf17ce31e36")},
+                { 2, uint256S("0xd18a3f4ac8aab7647e2b06771cb389dba4a6ec8b107b5ea786e0e3eca0af0373")},
             }
         };
 
