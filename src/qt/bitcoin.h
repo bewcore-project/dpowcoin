@@ -32,7 +32,7 @@ class Init;
 } // namespace interfaces
 
 
-/** Main Bitcoin application object */
+/** Main Dpowcoin application object */
 class BitcoinApplication: public QApplication
 {
     Q_OBJECT
