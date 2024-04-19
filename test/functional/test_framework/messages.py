@@ -29,16 +29,25 @@ import struct
 import time
 import unittest
 
+import dpowcoin_yespower
+import argon2
 from test_framework.siphash import siphash256
 from test_framework.util import assert_equal
 
+def GetArgon2idHash(input, salts, cost):
+    hash = argon2.low_level.hash_secret_raw(
+        time_cost=2, memory_cost=cost, parallelism=2,
+        hash_len=32, secret=input, salt=salts,
+        type=argon2.low_level.Type.ID,
+    )
+    return hash
 MAX_LOCATOR_SZ = 101
 MAX_BLOCK_WEIGHT = 4000000
 MAX_BLOOM_FILTER_SIZE = 36000
 MAX_BLOOM_HASH_FUNCS = 50
 
 COIN = 100000000  # 1 dpc in satoshis
-MAX_MONEY = 21000000 * COIN
+MAX_MONEY = 42000000 * COIN
 
 MAX_BIP125_RBF_SEQUENCE = 0xfffffffd  # Sequence number that is rbf-opt-in (BIP 125) and csv-opt-out (BIP 68)
 SEQUENCE_FINAL = 0xffffffff  # Sequence number that disables nLockTime if set for every input of a tx
@@ -655,7 +664,7 @@ class CTransaction:
     def is_valid(self):
         self.calc_sha256()
         for tout in self.vout:
-            if tout.nValue < 0 or tout.nValue > 21000000 * COIN:
+            if tout.nValue < 0 or tout.nValue > 42000000 * COIN:
                 return False
         return True
 
@@ -676,7 +685,7 @@ class CTransaction:
 
 class CBlockHeader:
     __slots__ = ("hash", "hashMerkleRoot", "hashPrevBlock", "nBits", "nNonce",
-                 "nTime", "nVersion", "sha256")
+                 "nTime", "nVersion", "sha256", "argon2id", "yespower")
 
     def __init__(self, header=None):
         if header is None:
@@ -690,6 +699,8 @@ class CBlockHeader:
             self.nNonce = header.nNonce
             self.sha256 = header.sha256
             self.hash = header.hash
+            self.argon2id = header.argon2id
+            self.yespower = header.yespower
             self.calc_sha256()
 
     def set_null(self):
@@ -701,6 +712,8 @@ class CBlockHeader:
         self.nNonce = 0
         self.sha256 = None
         self.hash = None
+        self.argon2id = None
+        self.yespower = None
 
     def deserialize(self, f):
         self.nVersion = struct.unpack("<i", f.read(4))[0]
@@ -711,6 +724,8 @@ class CBlockHeader:
         self.nNonce = struct.unpack("<I", f.read(4))[0]
         self.sha256 = None
         self.hash = None
+        self.argon2id = None
+        self.yespower = None
 
     def serialize(self):
         r = b""
@@ -733,9 +748,26 @@ class CBlockHeader:
             r += struct.pack("<I", self.nNonce)
             self.sha256 = uint256_from_str(hash256(r))
             self.hash = hash256(r)[::-1].hex()
+            # Print SHA-256 hash
+            #print("SHA-256 hash:", self.hash)
+            
+            # get argon2id pow hash
+            hash1 = GetArgon2idHash(r, hashlib.sha512(hashlib.sha512(r).digest()).digest(), 4096)
+            hash2 = GetArgon2idHash(r, hash1, 32768)
+            hash3 = hash2
+            self.argon2id = uint256_from_str(hash3)
+            # Print Argon2id hash
+            #print("Argon2id hash:", hash3.hex())
+            
+            yhash = dpowcoin_yespower.getPoWHash(r)
+            self.yespower = uint256_from_str(yhash)
+            # Print YesPower hash
+            #print("YesPower hash:", yhash.hex())
 
     def rehash(self):
         self.sha256 = None
+        self.argon2id = None
+        self.yespower = None
         self.calc_sha256()
         return self.sha256
 
@@ -799,7 +831,7 @@ class CBlock(CBlockHeader):
     def is_valid(self):
         self.calc_sha256()
         target = uint256_from_compact(self.nBits)
-        if self.sha256 > target:
+        while self.argon2id > target and self.yespower > target:
             return False
         for tx in self.vtx:
             if not tx.is_valid():
@@ -811,7 +843,7 @@ class CBlock(CBlockHeader):
     def solve(self):
         self.rehash()
         target = uint256_from_compact(self.nBits)
-        while self.sha256 > target:
+        while self.argon2id > target and self.yespower > target:
             self.nNonce += 1
             self.rehash()
 

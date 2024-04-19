@@ -20,14 +20,14 @@ import sys
 import hashlib
 
 SHA256_SUMS = {
-    "3a7bdd959a0b426624f63f394f25e5b7769a5a2f96f8126dcc2ea53f3fa5212b": {"tag": "v25.0", "tarball": "dpowcoin-26.1-aarch64-linux-gnu.tar.gz"},
-    "e537c8630b05e63242d979c3004f851fd73c2a10b5b4fdbb161788427c7b3c0f": {"tag": "v25.0", "tarball": "dpowcoin-26.1-arm-linux-gnueabihf.tar.gz"},
-    "3b35075d6c1209743611c705a13575be2668bc069bc6301ce78a2e1e53ebe7cc": {"tag": "v25.0", "tarball": "dpowcoin-26.1-arm64-apple-darwin.tar.gz"},
-    "0c8e135a6fd297270d3b65196042d761453493a022b5ff7fb847fc911e938214": {"tag": "v25.0", "tarball": "dpowcoin-26.1-powerpc64-linux-gnu.tar.gz"},
-    "fa8af160782f5adfcea570f72b947073c1663b3e9c3cd0f82b216b609fe47573": {"tag": "v25.0", "tarball": "dpowcoin-26.1-powerpc64le-linux-gnu.tar.gz"},
-    "fe6e347a66043946920c72c9c4afca301968101e6b82fb90a63d7885ebcceb32": {"tag": "v25.0", "tarball": "dpowcoin-26.1-riscv64-linux-gnu.tar.gz"},
-    "5708fc639cdfc27347cccfd50db9b73b53647b36fb5f3a4a93537cbe8828c27f": {"tag": "v25.0", "tarball": "dpowcoin-26.1-x86_64-apple-darwin.tar.gz"},
-    "33930d432593e49d58a9bff4c30078823e9af5d98594d2935862788ce8a20aec": {"tag": "v25.0", "tarball": "dpowcoin-26.1-x86_64-linux-gnu.tar.gz"},
+    "3a7bdd959a0b426624f63f394f25e5b7769a5a2f96f8126dcc2ea53f3fa5212b": {"tag": "v26.1", "tarball": "dpowcoin-26.1-aarch64-linux-gnu.tar.gz"},
+    "e537c8630b05e63242d979c3004f851fd73c2a10b5b4fdbb161788427c7b3c0f": {"tag": "v26.1", "tarball": "dpowcoin-26.1-arm-linux-gnueabihf.tar.gz"},
+    "3b35075d6c1209743611c705a13575be2668bc069bc6301ce78a2e1e53ebe7cc": {"tag": "v26.1", "tarball": "dpowcoin-26.1-arm64-apple-darwin.tar.gz"},
+    "0c8e135a6fd297270d3b65196042d761453493a022b5ff7fb847fc911e938214": {"tag": "v26.1", "tarball": "dpowcoin-26.1-powerpc64-linux-gnu.tar.gz"},
+    "fa8af160782f5adfcea570f72b947073c1663b3e9c3cd0f82b216b609fe47573": {"tag": "v26.1", "tarball": "dpowcoin-26.1-powerpc64le-linux-gnu.tar.gz"},
+    "fe6e347a66043946920c72c9c4afca301968101e6b82fb90a63d7885ebcceb32": {"tag": "v26.1", "tarball": "dpowcoin-26.1-riscv64-linux-gnu.tar.gz"},
+    "5708fc639cdfc27347cccfd50db9b73b53647b36fb5f3a4a93537cbe8828c27f": {"tag": "v26.1", "tarball": "dpowcoin-26.1-x86_64-apple-darwin.tar.gz"},
+    "33930d432593e49d58a9bff4c30078823e9af5d98594d2935862788ce8a20aec": {"tag": "v26.1", "tarball": "dpowcoin-26.1-x86_64-linux-gnu.tar.gz"},
 }
 
 
