@@ -65,7 +65,7 @@ time-machine() {
 # Set common variables
 ################
 
-VERSION="${FORCE_VERSION:-26.1}"
+VERSION="${FORCE_VERSION:-26.2}"
 DISTNAME="${DISTNAME:-dpowcoin-${VERSION}}"
 
 version_base_prefix="${PWD}/guix-build-"
