@@ -1,4 +1,4 @@
-26.1 Release Notes
+26.2 Release Notes
 ==================
 
 Dpowcoin Core version 26.2 is now available from:
