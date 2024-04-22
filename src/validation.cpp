@@ -3638,17 +3638,17 @@ static bool CheckBlockHeader(const CBlockHeader& block, BlockValidationState& st
     bool powResult1 = fCheckPOW ? CheckProofOfWork(block.GetYespowerPoWHash(), block.nBits, consensusParams) : true;
 
     if (!powResult1) {
-        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "yespower proof of work's failed");
-    }
+        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work's failed");
+    } else {
+        bool powResult2 = fCheckPOW ? CheckProofOfWork(block.GetArgon2idPoWHash(), block.nBits, consensusParams) : true;
 
-    bool powResult2 = fCheckPOW ? CheckProofOfWork(block.GetArgon2idPoWHash(), block.nBits, consensusParams) : true;
-
-    if (!powResult2) {
-        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "argon2id proof of work's failed");
+        if (!powResult2) {
+            return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work's failed");
+        }
     }
 
     return true;
-};
+}
 
 static bool CheckMerkleRoot(const CBlock& block, BlockValidationState& state)
 {
