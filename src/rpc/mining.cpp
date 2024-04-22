@@ -127,11 +127,12 @@ static bool GenerateBlock(ChainstateManager& chainman, CBlock& block, uint64_t& 
         CBlock temp_block = block;
         for (uint64_t nonce = start_nonce; nonce < end_nonce && !block_found && max_tries > 0 && !ShutdownRequested(); ++nonce) {
             temp_block.nNonce = nonce;
-            if (CheckProofOfWork(temp_block.GetYespowerPoWHash(), temp_block.nBits, chainman.GetConsensus()) && 
-                CheckProofOfWork(temp_block.GetArgon2idPoWHash(), temp_block.nBits, chainman.GetConsensus())) {
-                block_out = std::make_shared<const CBlock>(temp_block);
-                block_found = true;
-                break;
+            if (CheckProofOfWork(temp_block.GetYespowerPoWHash(), temp_block.nBits, chainman.GetConsensus())) {
+                if (CheckProofOfWork(temp_block.GetArgon2idPoWHash(), temp_block.nBits, chainman.GetConsensus())) {
+                    block_out = std::make_shared<const CBlock>(temp_block);
+                    block_found = true;
+                    break;
+                }
             }
             --max_tries;
         }

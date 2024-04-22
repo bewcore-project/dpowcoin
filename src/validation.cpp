@@ -3636,15 +3636,19 @@ static bool CheckBlockHeader(const CBlockHeader& block, BlockValidationState& st
 {
     // Check proof of work's matches claimed amount (dual pow logic)
     bool powResult1 = fCheckPOW ? CheckProofOfWork(block.GetYespowerPoWHash(), block.nBits, consensusParams) : true;
+
+    if (!powResult1) {
+        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "yespower proof of work's failed");
+    }
+
     bool powResult2 = fCheckPOW ? CheckProofOfWork(block.GetArgon2idPoWHash(), block.nBits, consensusParams) : true;
 
-    // Сhecking if both POW's are valid
-    if (!powResult1 || !powResult2) {
-        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "proof of work's failed");
+    if (!powResult2) {
+        return state.Invalid(BlockValidationResult::BLOCK_INVALID_HEADER, "high-hash", "argon2id proof of work's failed");
     }
 
     return true;
-}
+};
 
 static bool CheckMerkleRoot(const CBlock& block, BlockValidationState& state)
 {
@@ -3836,7 +3840,12 @@ bool HasValidProofOfWork(const std::vector<CBlockHeader>& headers, const Consens
     return std::all_of(headers.cbegin(), headers.cend(),
             [&](const auto& header) { 
                 bool check1 = CheckProofOfWork(header.GetYespowerPoWHash(), header.nBits, consensusParams);
-                bool check2 = CheckProofOfWork(header.GetArgon2idPoWHash(), header.nBits, consensusParams);
+                bool check2 = true; // if yespower return true then only we check agon2id
+                
+                if (check1) { // if yespower return true then only we check agon2id
+                    check2 = CheckProofOfWork(header.GetArgon2idPoWHash(), header.nBits, consensusParams);
+                }
+                
                 return check1 && check2;
             });
 }
