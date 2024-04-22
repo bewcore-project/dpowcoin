@@ -38,6 +38,8 @@
 #include <validationinterface.h>
 #include <warnings.h>
 
+#include <thread>
+#include <vector>
 #include <memory>
 #include <stdint.h>
 
@@ -115,23 +117,44 @@ static RPCHelpMan getnetworkhashps()
     };
 }
 
-static bool GenerateBlock(ChainstateManager& chainman, CBlock& block, uint64_t& max_tries, std::shared_ptr<const CBlock>& block_out, bool process_new_block)
+static bool GenerateBlock(ChainstateManager& chainman, CBlock& block, uint64_t& max_tries, std::shared_ptr<const CBlock>& block_out, bool process_new_block, uint64_t& num_threads)
 {
     block_out.reset();
     block.hashMerkleRoot = BlockMerkleRoot(block);
-    // dual pow logic
-    while (max_tries > 0 && block.nNonce < std::numeric_limits<uint32_t>::max() && !(CheckProofOfWork(block.GetYespowerPoWHash(), block.nBits, chainman.GetConsensus()) && CheckProofOfWork(block.GetArgon2idPoWHash(), block.nBits, chainman.GetConsensus())) && !ShutdownRequested()) {
-        ++block.nNonce;
-        --max_tries;
-    }
-    if (max_tries == 0 || ShutdownRequested()) {
-        return false;
-    }
-    if (block.nNonce == std::numeric_limits<uint32_t>::max()) {
-        return true;
+    std::atomic<bool> block_found(false);
+
+    auto search_and_validate_function = [&](uint64_t start_nonce, uint64_t end_nonce) {
+        CBlock temp_block = block;
+        for (uint64_t nonce = start_nonce; nonce < end_nonce && !block_found && max_tries > 0 && !ShutdownRequested(); ++nonce) {
+            temp_block.nNonce = nonce;
+            if (CheckProofOfWork(temp_block.GetYespowerPoWHash(), temp_block.nBits, chainman.GetConsensus()) && 
+                CheckProofOfWork(temp_block.GetArgon2idPoWHash(), temp_block.nBits, chainman.GetConsensus())) {
+                block_out = std::make_shared<const CBlock>(temp_block);
+                block_found = true;
+                break;
+            }
+            --max_tries;
+        }
+    };
+
+    const uint64_t tries_per_thread = max_tries / num_threads;
+    uint64_t start_nonce = block.nNonce;
+    for (int i = 0; i < num_threads; ++i) {
+        uint64_t end_nonce = start_nonce + tries_per_thread;
+        if (i == num_threads - 1) {
+            end_nonce += max_tries % num_threads;
+        }
+        std::thread(search_and_validate_function, start_nonce, end_nonce).detach();
+        start_nonce = end_nonce;
     }
 
-    block_out = std::make_shared<const CBlock>(block);
+    while (!block_found && !ShutdownRequested()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    if (!block_found) {
+        return false;
+    }
 
     if (!process_new_block) return true;
 
@@ -142,7 +165,8 @@ static bool GenerateBlock(ChainstateManager& chainman, CBlock& block, uint64_t& 
     return true;
 }
 
-static UniValue generateBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, const CScript& coinbase_script, int nGenerate, uint64_t nMaxTries)
+
+static UniValue generateBlocks(ChainstateManager& chainman, const CTxMemPool& mempool, const CScript& coinbase_script, int nGenerate, uint64_t nMaxTries, uint64_t num_threads)
 {
     UniValue blockHashes(UniValue::VARR);
     while (nGenerate > 0 && !ShutdownRequested()) {
@@ -151,7 +175,7 @@ static UniValue generateBlocks(ChainstateManager& chainman, const CTxMemPool& me
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
 
         std::shared_ptr<const CBlock> block_out;
-        if (!GenerateBlock(chainman, pblocktemplate->block, nMaxTries, block_out, /*process_new_block=*/true)) {
+        if (!GenerateBlock(chainman, pblocktemplate->block, nMaxTries, block_out, /*process_new_block=*/true, num_threads)) {
             break;
         }
 
@@ -162,6 +186,7 @@ static UniValue generateBlocks(ChainstateManager& chainman, const CTxMemPool& me
     }
     return blockHashes;
 }
+
 
 static bool getScriptFromDescriptor(const std::string& descriptor, CScript& script, std::string& error)
 {
@@ -206,6 +231,7 @@ static RPCHelpMan generatetodescriptor()
             {"num_blocks", RPCArg::Type::NUM, RPCArg::Optional::NO, "How many blocks are generated."},
             {"descriptor", RPCArg::Type::STR, RPCArg::Optional::NO, "The descriptor to send the newly generated dpowcoin to."},
             {"maxtries", RPCArg::Type::NUM, RPCArg::Default{DEFAULT_MAX_TRIES}, "How many iterations to try."},
+            {"num_threads", RPCArg::Type::NUM, RPCArg::Default{DEFAULT_NUM_THREADS}, "Number of threads for block generation."},
         },
         RPCResult{
             RPCResult::Type::ARR, "", "hashes of blocks generated",
@@ -219,6 +245,7 @@ static RPCHelpMan generatetodescriptor()
 {
     const auto num_blocks{self.Arg<int>(0)};
     const auto max_tries{self.Arg<uint64_t>(2)};
+    const auto num_threads{self.Arg<uint64_t>(3)};
 
     CScript coinbase_script;
     std::string error;
@@ -230,7 +257,7 @@ static RPCHelpMan generatetodescriptor()
     const CTxMemPool& mempool = EnsureMemPool(node);
     ChainstateManager& chainman = EnsureChainman(node);
 
-    return generateBlocks(chainman, mempool, coinbase_script, num_blocks, max_tries);
+    return generateBlocks(chainman, mempool, coinbase_script, num_blocks, max_tries, num_threads);
 },
     };
 }
@@ -250,6 +277,7 @@ static RPCHelpMan generatetoaddress()
              {"nblocks", RPCArg::Type::NUM, RPCArg::Optional::NO, "How many blocks are generated."},
              {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The address to send the newly generated dpowcoin to."},
              {"maxtries", RPCArg::Type::NUM, RPCArg::Default{DEFAULT_MAX_TRIES}, "How many iterations to try."},
+             {"num_threads", RPCArg::Type::NUM, RPCArg::Default{DEFAULT_NUM_THREADS}, "Number of threads for block generation."},
          },
          RPCResult{
              RPCResult::Type::ARR, "", "hashes of blocks generated",
@@ -266,6 +294,7 @@ static RPCHelpMan generatetoaddress()
 {
     const int num_blocks{request.params[0].getInt<int>()};
     const uint64_t max_tries{request.params[2].isNull() ? DEFAULT_MAX_TRIES : request.params[2].getInt<int>()};
+    const uint64_t num_threads{request.params[3].isNull() ? DEFAULT_NUM_THREADS : request.params[3].getInt<int>()};
 
     CTxDestination destination = DecodeDestination(request.params[1].get_str());
     if (!IsValidDestination(destination)) {
@@ -278,7 +307,7 @@ static RPCHelpMan generatetoaddress()
 
     CScript coinbase_script = GetScriptForDestination(destination);
 
-    return generateBlocks(chainman, mempool, coinbase_script, num_blocks, max_tries);
+    return generateBlocks(chainman, mempool, coinbase_script, num_blocks, max_tries, num_threads);
 },
     };
 }
@@ -382,8 +411,9 @@ static RPCHelpMan generateblock()
 
     std::shared_ptr<const CBlock> block_out;
     uint64_t max_tries{DEFAULT_MAX_TRIES};
+    uint64_t num_threads{DEFAULT_NUM_THREADS};
 
-    if (!GenerateBlock(chainman, block, max_tries, block_out, process_new_block) || !block_out) {
+    if (!GenerateBlock(chainman, block, max_tries, block_out, process_new_block, num_threads) || !block_out) {
         throw JSONRPCError(RPC_MISC_ERROR, "Failed to make block.");
     }
 

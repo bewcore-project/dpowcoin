@@ -84,9 +84,9 @@ static void SetupCliArgs(ArgsManager& argsman)
     argsman.AddArg("-datadir=<dir>", "Specify data directory", ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-generate",
                    strprintf("Generate blocks, equivalent to RPC getnewaddress followed by RPC generatetoaddress. Optional positional integer "
-                             "arguments are number of blocks to generate (default: %s) and maximum iterations to try (default: %s), equivalent to "
-                             "RPC generatetoaddress nblocks and maxtries arguments. Example: dpowcoin-cli -generate 4 1000",
-                             DEFAULT_NBLOCKS, DEFAULT_MAX_TRIES),
+                             "arguments are number of blocks to generate (default: %s) and maximum iterations to try (default: %s) and maximum threads (default: %s) , equivalent to "
+                             "RPC generatetoaddress nblocks and maxtries num_threads arguments. Example: dpowcoin-cli -generate 4 1000 1",
+                             DEFAULT_NBLOCKS, DEFAULT_MAX_TRIES, DEFAULT_NUM_THREADS),
                    ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-addrinfo", "Get the number of addresses known to the node, per network and total, after filtering for quality and recency. The total number of addresses known to the node may be higher.", ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-getinfo", "Get general information from the remote server. Note that unlike server-side RPC calls, the output of -getinfo is the result of multiple non-atomic requests. Some entries in the output may represent results from different states (e.g. wallet balance may be as of a different block from the chain state reported)", ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
@@ -1107,7 +1107,7 @@ static UniValue GetNewAddress()
  */
 static void SetGenerateToAddressArgs(const std::string& address, std::vector<std::string>& args)
 {
-    if (args.size() > 2) throw std::runtime_error("too many arguments (maximum 2 for nblocks and maxtries)");
+    if (args.size() > 3) throw std::runtime_error("too many arguments (maximum 3 for nblocks, maxtries, and num_threads)");
     if (args.size() == 0) {
         args.emplace_back(DEFAULT_NBLOCKS);
     } else if (args.at(0) == "0") {
