@@ -21,6 +21,13 @@ License
 Dpowcoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see https://opensource.org/licenses/MIT.
 
+
+IMPORTANT !
+-----------
+
+We do not use "delayed POW" technology and are not related to komodo projects! We use double PoW or Dual POW!
+-------------------------------------------------------------------------------------------------------------
+
 Development Process
 -------------------
 
