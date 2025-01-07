@@ -76,7 +76,7 @@ public:
         consensus.signet_challenge.clear();
         consensus.nSubsidyHalvingInterval = 420000;
         consensus.BIP34Height = 2;
-        consensus.BIP34Hash = uint256S("0xd18a3f4ac8aab7647e2b06771cb389dba4a6ec8b107b5ea786e0e3eca0af0373");
+        consensus.BIP34Hash = uint256{};
         consensus.BIP65Height = 2;
         consensus.BIP66Height = 2;
         consensus.CSVHeight = 2;
@@ -101,15 +101,15 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
         consensus.vDeployments[Consensus::DEPLOYMENT_TAPROOT].min_activation_height = 0; // No activation delay
 
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000000000000001ec9a2"); //700
-        consensus.defaultAssumeValid = uint256S("0x2005b7aa8f35f4f38677c11fb336b04c038835dc60b259246491e0652110da0e"); //700
+        consensus.nMinimumChainWork = uint256S("0x00");
+        consensus.defaultAssumeValid = uint256S("0x00");
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xf2;
+        pchMessageStart[0] = 0xf3;
         pchMessageStart[1] = 0x9f;
         pchMessageStart[2] = 0x4a;
         pchMessageStart[3] = 0xfb;
@@ -128,17 +128,7 @@ public:
         // This is fine at runtime as we'll fall back to using them as an addrfetch if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.emplace_back("seed.dpowcore.org."); //active
-        vSeeds.emplace_back("seed1.dpowcore.org."); //actvie
-        vSeeds.emplace_back("dpowc.oette.info."); //active
-        vSeeds.emplace_back("dpowcseed.oette.info."); //active
-        vSeeds.emplace_back("seed2.dpowcore.org."); //reserved
-        vSeeds.emplace_back("seed3.dpowcore.org."); //reserved
-        vSeeds.emplace_back("seed4.dpowcore.org."); //reserved
-        vSeeds.emplace_back("seed5.dpowcore.org."); //reserved
-        vSeeds.emplace_back("seed6.dpowcore.org."); //reserved
-        vSeeds.emplace_back("seeddpowcoin1.bitwebcore.net.");
-        vSeeds.emplace_back("seeddpowcoin2.bitwebcore.net.");
+        vSeeds.emplace_back("127.0.0.1"); //active
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,55);
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,28);
@@ -156,8 +146,6 @@ public:
         checkpointData = {
             {
                 { 0, uint256S("0xd86f8a0582e779830f182befeaaabc8c73a159b6b06530910758daf17ce31e36")},
-                { 2, uint256S("0xd18a3f4ac8aab7647e2b06771cb389dba4a6ec8b107b5ea786e0e3eca0af0373")},
-                { 700, uint256S("0x2005b7aa8f35f4f38677c11fb336b04c038835dc60b259246491e0652110da0e")},
             }
         };
 
@@ -167,9 +155,9 @@ public:
 
         chainTxData = ChainTxData{
             // Data from RPC: getchaintxstats 699 2005b7aa8f35f4f38677c11fb336b04c038835dc60b259246491e0652110da0e
-            .nTime    = 1713620152,
-            .nTxCount = 704,
-            .dTxRate  = 0.006891690813689404,
+            .nTime    = 0,
+            .nTxCount = 0,
+            .dTxRate  = 0,
         };
     }
 };
