@@ -19,7 +19,7 @@ namespace wallet {
 /**
  * IsMine() return codes, which depend on ScriptPubKeyMan implementation.
  * Not every ScriptPubKeyMan covers all types, please refer to
- * https://github.com/dpowcore-project/dpowcoin/blob/master/doc/bitcoin-release-notes/release-notes-0.21.0.md#ismine-semantics
+ * https://github.com/bewcore-project/dpowcoin/blob/master/doc/bitcoin-release-notes/release-notes-0.21.0.md#ismine-semantics
  * for better understanding.
  *
  * For LegacyScriptPubKeyMan,

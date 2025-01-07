@@ -11,7 +11,7 @@
 
 [Unit]
 Description=Dpowcoin daemon
-Documentation=https://github.com/dpowcore-project/dpowcoin/blob/master/doc/init.md
+Documentation=https://github.com/bewcore-project/dpowcoin/blob/master/doc/init.md
 
 # https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget/
 After=network-online.target

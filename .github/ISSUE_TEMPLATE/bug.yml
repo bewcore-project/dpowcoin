@@ -49,7 +49,7 @@ body:
       description: |
         Please copy and paste any relevant log output or attach a debug log file.
 
-        You can find the debug.log in your [data dir.](https://github.com/dpowcore-project/dpowcoin/blob/master/doc/files.md#data-directory-location)
+        You can find the debug.log in your [data dir.](https://github.com/bewcore-project/dpowcoin/blob/master/doc/files.md#data-directory-location)
 
         Please be aware that the debug log might contain personally identifying information.
     validations:

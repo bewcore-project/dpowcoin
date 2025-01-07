@@ -20,7 +20,7 @@ See [dependencies.md](dependencies.md) for a complete overview.
 ### 2. Clone Dpowcoin Repo
 Clone the Dpowcoin Core repository to a directory. All build scripts and commands will run from this directory.
 ``` bash
-git clone https://github.com/dpowcore-project/dpowcoin.git
+git clone https://github.com/bewcore-project/dpowcoin.git
 ```
 
 ### 3. Install Optional Dependencies

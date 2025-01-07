@@ -10,7 +10,7 @@ A script to call a faucet to get Signet coins.
 Syntax: `getcoins.py [-h|--help] [-c|--cmd=<dpowcoin-cli path>] [-f|--faucet=<faucet URL>] [-a|--addr=<signet bech32 address>] [-p|--password=<faucet password>] [--] [<dpowcoin-cli args>]`
 
 * `--cmd` lets you customize the dpowcoin-cli path. By default it will look for it in the PATH
-* `--faucet` lets you specify which faucet to use; the faucet is assumed to be compatible with https://github.com/dpowcore-project/bitcoin-faucet
+* `--faucet` lets you specify which faucet to use; the faucet is assumed to be compatible with https://github.com/bewcore-project/bitcoin-faucet
 * `--addr` lets you specify a Signet address; by default, the address must be a bech32 address. This and `--cmd` above complement each other (i.e. you do not need `dpowcoin-cli` if you use `--addr`)
 * `--password` lets you specify a faucet password; this is handy if you are in a classroom and set up your own faucet for your students; (above faucet does not limit by IP when password is enabled)
 

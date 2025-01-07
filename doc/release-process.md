@@ -5,10 +5,10 @@ Release Process
 
 ### Before every release candidate
 
-* Update translations see [translation_process.md](https://github.com/dpowcore-project/dpowcoin/blob/master/doc/translation_process.md#synchronising-translations).
+* Update translations see [translation_process.md](https://github.com/bewcore-project/dpowcoin/blob/master/doc/translation_process.md#synchronising-translations).
 * Update release candidate version in `configure.ac` (`CLIENT_VERSION_RC`).
-* Update manpages (after rebuilding the binaries), see [gen-manpages.py](https://github.com/dpowcore-project/dpowcoin/blob/master/contrib/devtools/README.md#gen-manpagespy).
-* Update bitcoin.conf and commit, see [gen-bitcoin-conf.sh](https://github.com/dpowcore-project/dpowcoin/blob/master/contrib/devtools/README.md#gen-bitcoin-confsh).
+* Update manpages (after rebuilding the binaries), see [gen-manpages.py](https://github.com/bewcore-project/dpowcoin/blob/master/contrib/devtools/README.md#gen-manpagespy).
+* Update bitcoin.conf and commit, see [gen-bitcoin-conf.sh](https://github.com/bewcore-project/dpowcoin/blob/master/contrib/devtools/README.md#gen-bitcoin-confsh).
 
 ### Before every major and minor release
 
@@ -96,7 +96,7 @@ Check out the source code in the following directory hierarchy.
     cd /path/to/your/toplevel/build
     git clone https://github.com/bitcoin-core/guix.sigs.git
     git clone https://github.com/bitcoin-core/bitcoin-detached-sigs.git
-    git clone https://github.com/dpowcore-project/dpowcoin.git
+    git clone https://github.com/bewcore-project/dpowcoin.git
 
 ### Write the release notes
 
@@ -270,9 +270,9 @@ cat "$VERSION"/*/all.SHA256SUMS.asc > SHA256SUMS.asc
   - bitcoincore.org maintained versions update:
     [table](https://github.com/bitcoin-core/bitcoincore.org/commits/master/_includes/posts/maintenance-table.md)
 
-  - Delete post-EOL [release branches](https://github.com/dpowcore-project/dpowcoin/branches/all) and create a tag `v${branch_name}-final`.
+  - Delete post-EOL [release branches](https://github.com/bewcore-project/dpowcoin/branches/all) and create a tag `v${branch_name}-final`.
 
-  - Delete ["Needs backport" labels](https://github.com/dpowcore-project/dpowcoin/labels?q=backport) for non-existing branches.
+  - Delete ["Needs backport" labels](https://github.com/bewcore-project/dpowcoin/labels?q=backport) for non-existing branches.
 
   - bitcoincore.org RPC documentation update
 
@@ -288,7 +288,7 @@ cat "$VERSION"/*/all.SHA256SUMS.asc > SHA256SUMS.asc
 
       - Archive the release notes for the new version to `doc/release-notes/` (branch `master` and branch of the release)
 
-      - Create a [new GitHub release](https://github.com/dpowcore-project/dpowcoin/releases/new) with a link to the archived release notes
+      - Create a [new GitHub release](https://github.com/bewcore-project/dpowcoin/releases/new) with a link to the archived release notes
 
 - Announce the release:
 
